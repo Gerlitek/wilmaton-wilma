@@ -10,3 +10,6 @@ data/
 .private-terms.txt
 *.log
 config.toml
+
+# Omat muistiinpanot ja tehtävälista
+TODO.md
