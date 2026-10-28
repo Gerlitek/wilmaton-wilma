@@ -1,0 +1,12 @@
+node_modules/
+__pycache__/
+.venv/
+.env
+data/
+.DS_Store
+# Salaisuudet ja henkilökohtaiset asetukset (kaikki .env-tiedostot, paitsi mallipohja)
+.env.*
+!.env.example
+.private-terms.txt
+*.log
+config.toml

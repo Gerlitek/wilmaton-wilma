@@ -1,0 +1,18 @@
+# Kopioi tiedostoksi config.toml (ei mene Gitiin). Salasana ja TOTP-avain eivät kuulu tänne: ne ovat Keychainissa.
+
+[ollama]
+url = "http://localhost:11434"     # vain tämä kone sallitaan (localhost); viestejä ei lähetetä minnekään muualle
+model = "qwen3:8b"
+
+[messages]
+shared_priority = []              # lapset tärkein ensin (oppilasnumero tai nimen alku), esim. ["Kiia", "Onni"]: koulun yhteinen viesti
+                                   # (tulee usealle sisarukselle) käsitellään kerran ja menee vain ensimmäisen listalla olevan lapsen kalenteriin
+external_organizers = []           # oman alueesi ulkopuoliset tahot (esim. hyvinvointialueen lyhenne, "seurakunta"): annetaan mallille vihjeenä,
+                                   # ei sääntönä. Malli päättää, onko tilaisuus tiedoksi (ei muistutusta) vai koulun oma
+pe_subject_words = ["liikunta"]    # sanat, joista lukujärjestyksen liikuntatunti tunnistetaan aineen nimestä (viikkoon sidottu liikunta
+                                   # sijoitetaan näille tunneille)
+
+[reminders]
+hour = 18                          # muistutuksen kellonaika
+exam_days_before = 2               # kokeen muistutus: montako päivää ennen (kirja kotiin, lukeminen)
+parents_days_before = [1, 3]       # koulun vanhempainillan muistutukset: päiviä ennen (useampi, koska tärkeä)

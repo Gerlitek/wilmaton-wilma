@@ -1,0 +1,2 @@
+# Vain kalenterivientiin (macOS). Haku ja testit toimivat ilman.
+pyobjc-framework-EventKit

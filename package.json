@@ -1,0 +1,9 @@
+{
+  "name": "wilma",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Omat Wilma-työkalut. Wilma-haku tulee aikarjal/wilmai:n CLI:stä riippuvuutena; oma koodi on Pythonissa (oma_wilma/).",
+  "dependencies": {
+    "@wilm-ai/wilma-cli": "^2.3.0"
+  }
+}

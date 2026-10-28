@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>fi.wilma.daily</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>@DIR@/scripts/run.sh</string>
+        <string>--if-due</string>
+    </array>
+    <!-- Kone sammutetaan päivittäin: ajo yritetään myös kirjautuessa. run.sh --if-due rajaa sen kerran päivässä. -->
+    <key>RunAtLoad</key>
+    <true/>
+    <!-- launchd antaa vain minimaalisen PATHin: ollama ja node ovat /usr/local/bin:ssä tai /opt/homebrew/bin:ssä -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>@DIR@</string>
+    <!-- Joka päivä klo 16.00. Vaihda tunti tarvittaessa ja aja: scripts/schedule.sh on -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>16</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>@DIR@/data/run.log</string>
+    <key>StandardErrorPath</key>
+    <string>@DIR@/data/run.log</string>
+</dict>
+</plist>
