@@ -200,3 +200,17 @@ class GearTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DayNamedOverridesWeekTest(unittest.TestCase):
+    """Viestissä nimetty päivä (vaikka mennyt) ohittaa viikkotason liikunnan: ei luistelua lukujärjestyksen muille päiville."""
+
+    def test_past_named_day_blocks_week_level_item_of_same_activity(self):
+        from datetime import timedelta
+        from .helpers import info
+        i = info()
+        monday = date(2026, 10, 26)
+        week = {"info": i, "kind": "pe", "title": "luistelu", "week": monday, "weeknr": 44}
+        other = {"info": i, "kind": "pe", "title": "sisäliikunta", "week": monday, "weeknr": 44}
+        pins = {notices.pin_of({"info": i, "title": "luistelu", "date": monday + timedelta(days=2)})}
+        self.assertEqual(notices.drop_overridden([week, other], pins), [other])

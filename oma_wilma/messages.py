@@ -20,6 +20,7 @@ class MessageInfo:
     unread: bool
     reply_count: int
     sent_at: str = ""   # täsmällinen lähetysaika (vertailuun: sama viesti eri tunnisteilla)
+    also_for: tuple[str, ...] = ()   # sisarusten nimet, joille sama viesti tuli mutta joille sitä ei viedä (dedupe_shared)
 
 
 @dataclass(frozen=True)

@@ -15,13 +15,14 @@ from __future__ import annotations
 
 import json
 import os
+from dataclasses import replace
 from datetime import date, timedelta
 
 from . import messages as msgs
 from . import models, ollama
 from .config import ROOT, settings
 from .notice_events import build_events, expand_weeks
-from .notices import Ask, ask_model, interpret
+from .notices import Ask, ask_model, drop_overridden, interpret
 from .report import format_events
 
 STATE = ROOT / "data" / "messages.json"
@@ -81,7 +82,12 @@ def dedupe_shared(infos: list[msgs.MessageInfo], priority: list[str] | None) -> 
     def rank(i: msgs.MessageInfo) -> int:
         return next((n for n, ref in enumerate(priority) if models.is_student(i.student, ref)), len(priority))
 
-    return [min(g, key=rank) for g in groups]
+    out = []
+    for g in groups:
+        best = min(g, key=rank)
+        others = tuple(dict.fromkeys(i.student.name for i in g if i.student.number != best.student.number))
+        out.append(replace(best, also_for=others) if others else best)
+    return out
 
 
 def pending(infos: list[msgs.MessageInfo], state: dict, days: int, today: date) -> list[msgs.MessageInfo]:
@@ -93,8 +99,9 @@ def pending(infos: list[msgs.MessageInfo], state: dict, days: int, today: date) 
 def stale_uids(state: dict, new_uids: set[str], processed: set[str], today: date) -> list[str]:
     """Aiemmin viesteistä luodut tulevat tapahtumat, joita uusi tulkinta ei enää tuota. Vain jos kaikki tapahtuman
     lähdeviestit käsiteltiin nyt (muuten toinen viesti voi yhä tarvita sitä). Kokeilla ja vanhoilla tapahtumilla ei
-    ole lähteitä, joten niihin ei koskaan kosketa."""
-    return [u for u, v in state.items() if v.get("sources") and set(v["sources"]) <= processed
+    ole lähteitä, joten niihin ei koskaan kosketa. Tiedoksi-merkintöjä (ulkopuolisten tilaisuudet) ei poisteta: tulkinta
+    elää, ja kerran näkynyt tilaisuus ei saa kadota pois, vaikka malli ohittaisi sen seuraavalla kerralla."""
+    return [u for u, v in state.items() if v.get("sources") and v.get("kind") != "info" and set(v["sources"]) <= processed
             and u not in new_uids and date.fromisoformat(v["date"]) >= today]
 
 
@@ -111,6 +118,7 @@ def collect(infos: list[msgs.MessageInfo], days: int, dry_run: bool, ask: Ask = 
     items: list[dict] = []
     count = {"messages": 0, "none": 0, "rejected": 0, "failed": 0, "reasons": {}, "keys": set()}
     notes_cache: dict[str, list[str] | None] = {}
+    pins: set = set()                              # (oppilas, viikko, laji), jolle jokin viesti on nimennyt päivän
     todo = pending(infos, {} if again else state, days, today)
     if dry_run:                                   # viestin avaaminen voi merkitä sen luetuksi: kuiva-ajo ei avaa mitään
         count["would_open"] = len(todo)
@@ -124,7 +132,7 @@ def collect(infos: list[msgs.MessageInfo], days: int, dry_run: bool, ask: Ask = 
             if info.student.number not in notes_cache:           # oppilaan omat merkinnät haetaan kerran per ajo
                 notes_cache[info.student.number] = child_notes(info.student.number)
             found, notes = interpret(message, ask, today, explain, trace if explain else None,
-                                     child_notes=notes_cache[info.student.number])
+                                     child_notes=notes_cache[info.student.number], pins=pins)
         except ollama.OllamaError as e:
             count["failed"] += 1
             print(f"  {who}: {e}")
@@ -138,7 +146,7 @@ def collect(infos: list[msgs.MessageInfo], days: int, dry_run: bool, ask: Ask = 
         items += found
         new_state[key(info)] = {"replies": info.reply_count}
         count["keys"].add(key(info))
-    return items, new_state, count
+    return drop_overridden(items, pins), new_state, count
 
 
 # ---------------------------------------------------------------- koko ajo

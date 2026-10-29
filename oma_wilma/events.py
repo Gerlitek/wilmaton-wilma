@@ -62,6 +62,15 @@ def mark_uncertain(title: str, kind: str) -> str:
     return title.replace(emoji, emoji + "⚠️", 1)
 
 
+SHARED_MARK = "👬"           # viesti tuli useammalle lapselle, mutta tapahtuma on vain yhden kalenterissa
+
+
+def mark_shared(title: str, kind: str) -> str:
+    """👬 heti lajin emojin jälkeen: sama viesti tuli sisaruksillekin, vaikka tapahtuma on vain tämän lapsen kalenterissa."""
+    emoji = KINDS[kind][0]
+    return title.replace(emoji, emoji + SHARED_MARK, 1)
+
+
 def make_title(kind: str, text: str) -> str:
     """`<emoji><Laji>: <teksti>` ilman toistoa: "Retki: retki Nuuksioon" -> "Retki: Nuuksioon", "Vanhempainilta:
     vanhempainilta" -> "Vanhempainilta". Lajilla ilman etuliitettä (liikunta) otsikko on pelkkä teksti."""

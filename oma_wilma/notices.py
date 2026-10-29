@@ -86,7 +86,26 @@ def _without_unfounded_day(proposal: dict, text: str, sent: date) -> dict:
     return {**proposal, "date": day, "weekday": weekday, "timing_evidence": evidence}
 
 
-def _accept(proposal: dict, message: Message, today: date, explain: bool) -> tuple[list[dict], list[str]]:
+def activity_key(title: str) -> str:
+    """Lajin tunniste vertailua varten: nimen alkukirjaimet ("luistelu" ~ "Luistelua")."""
+    return "".join(c for c in title.lower() if c.isalpha())[:5]
+
+
+def pin_of(item: dict) -> tuple[str, date, str]:
+    """Päiväkohtaisen liikunnan lukitus: (oppilas, viikon maanantai, laji). Viestissä nimetty päivä ohittaa lukujärjestyksen."""
+    return item["info"].student.number, item["date"] - timedelta(days=item["date"].weekday()), activity_key(item["title"])
+
+
+def drop_overridden(items: list[dict], pins: set[tuple[str, date, str]]) -> list[dict]:
+    """Viikkotason liikunta, jonka lajille jokin viesti on nimennyt päivän samalle viikolle (vaikka päivä olisi jo mennyt),
+    ei saa levitä lukujärjestyksen muille liikuntatunneille: "luistelua vain keskiviikkona" ei tee luistelua torstaille."""
+    return [it for it in items
+            if not ("week" in it and it["kind"] == "pe"
+                    and (it["info"].student.number, it["week"], activity_key(it["title"])) in pins)]
+
+
+def _accept(proposal: dict, message: Message, today: date, explain: bool,
+            pins: set | None = None) -> tuple[list[dict], list[str]]:
     """Hyväksyy yhden mallin ehdotuksen kalenteriasioiksi. Palauttaa (asiat, hylkäysten syyt). Hylätään vain mahdoton:
     ei luokkaa tai nimeä, ajankohta ei selviä, mennyt tai liian kaukana."""
     category, title = (str(proposal.get(k) or "").strip() for k in ("category", "title"))
@@ -115,6 +134,8 @@ def _accept(proposal: dict, message: Message, today: date, explain: bool) -> tup
     }
     items, notes = [], []
     for target in targets:
+        if pins is not None and kind == "pe" and "date" in target:
+            pins.add(pin_of({**common, **target}))
         if "date" in target and target["date"] < today:
             notes.append("päivä on jo mennyt" + shown)
         elif "week" in target and target["week"] + timedelta(days=6) < today:
@@ -125,7 +146,8 @@ def _accept(proposal: dict, message: Message, today: date, explain: bool) -> tup
 
 
 def interpret(message: Message, ask: Ask = ask_model, today: date | None = None, explain: bool = False,
-              trace: list[str] | None = None, child_notes: list[str] | None = None) -> tuple[list[dict], list[str]]:
+              trace: list[str] | None = None, child_notes: list[str] | None = None,
+              pins: set | None = None) -> tuple[list[dict], list[str]]:
     """Palauttaa (asiat, huomautukset). Asia: info, kind, title, short_title, bring, optional, forbidden, uncertain ja
     joko date tai week+weeknr.
 
@@ -145,7 +167,7 @@ def interpret(message: Message, ask: Ask = ask_model, today: date | None = None,
             unsure = str(proposal.get("uncertain") or "").strip()
             trace.append("malli ehdotti: " + " | ".join(parts + ([", ".join(gear)] if gear else []))
                          + f" [{describe_when(proposal)}]" + (f" EPÄVARMA: {unsure}" if unsure else ""))
-        accepted, rejected = _accept(proposal, message, today, explain)
+        accepted, rejected = _accept(proposal, message, today, explain, pins)
         items += accepted
         notes += rejected
     kept = prefer_specific(items)

@@ -10,7 +10,7 @@ from datetime import date, datetime, time, timedelta
 from typing import Callable
 
 from .calendars import calendar_name, owner_line
-from .events import MAX_TEXT, alarm_days, make_title, mark_uncertain, reminders
+from .events import MAX_TEXT, alarm_days, make_title, mark_shared, mark_uncertain, reminders
 from .gear import as_list, fits, note_lines, title_part
 from .messages import MessageInfo
 
@@ -139,6 +139,8 @@ def _parts_of(group: list[dict]) -> dict[str, dict]:
     parts: dict[str, dict] = {}
     for g in group:
         part = parts.setdefault(g.get("src", ""), {"texts": [], "heads": [], "lines": []})
+        if g["info"].also_for:
+            part["also_for"] = list(g["info"].also_for)
         part["texts"].append(_text(g))
         part["heads"].append(_head(g))
         part["lines"] += _lines(g)
@@ -183,6 +185,10 @@ def build_events(items: list[dict], reminder_hour: int | None = None, previous: 
         heads = list(dict.fromkeys(h for part in parts.values() for h in part.get("heads", [])))
         # yksi asia: asia ja tärkein varuste; useita asioita samalle päivälle: vain asioiden nimet (otsikon pitää mahtua näytölle)
         title = make_title(kind, "; ".join(heads) if len(texts) > 1 and len(heads) == len(texts) else "; ".join(texts))
+        also = list(dict.fromkeys(n for part in parts.values() for n in part.get("also_for", [])))
+        if also:                                     # sama viesti tuli sisaruksille: merkki otsikkoon, nimet kuvaukseen
+            title = mark_shared(title, kind)
+            lines = [f"👬 Viesti tuli myös: {', '.join(also)} (tapahtuma vain tämän lapsen kalenterissa)"] + lines
         if unsure:                                   # malli sanoi, että jokin on epäselvää: tarkistusmerkintä ja syy
             title = mark_uncertain(title, kind)
             lines = [f"⚠️ TARKISTA: {'; '.join(unsure)}"] + lines

@@ -28,6 +28,11 @@ class SharedMessageTest(unittest.TestCase):
     def test_no_setting_no_dedupe(self):
         self.assertEqual(len(sync_messages.dedupe_shared(self.both(), None)), 2)
 
+    def test_kept_message_remembers_siblings(self):
+        (got,) = sync_messages.dedupe_shared(self.both(), ["Kiia"])
+        self.assertEqual(got.also_for, ("Onni Virtanen",))
+        self.assertEqual(sync_messages.dedupe_shared([info(student=KIIA, mid=7)], ["Kiia"])[0].also_for, ())
+
     def test_copy_with_other_id_but_same_sender_subject_time_is_shared(self):
         at = "2026-10-26T15:02:00+02:00"
         mk = lambda st, mid, when=at: messages.MessageInfo(st, mid, "Aihe", date(2026, 10, 26), "Opettaja", True, 0, when)
@@ -121,6 +126,10 @@ class StaleEventsTest(unittest.TestCase):
 
     def test_only_unproduced_future_events_from_reprocessed_messages(self):
         self.assertEqual(sync_messages.stale_uids(self.state(), {"b"}, {"1:7"}, self.today), ["a"])
+
+    def test_info_events_are_never_removed(self):
+        state = {"i": {"sources": ["1:7"], "date": "2026-11-04", "kind": "info"}}
+        self.assertEqual(sync_messages.stale_uids(state, set(), {"1:7"}, self.today), [])
 
     def test_nothing_removed_when_message_not_processed(self):
         self.assertEqual(sync_messages.stale_uids(self.state(), set(), set(), self.today), [])
