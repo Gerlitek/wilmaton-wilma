@@ -15,7 +15,7 @@ from typing import Callable
 
 from . import ollama
 from .gear import as_list
-from .mentions import date_in_text, weekday_in_text
+from .mentions import date_in_text, relative_day, weekday_in_text
 from .messages import Message
 from .notice_events import build_events, expand_weeks      # noqa: F401  (julkinen rajapinta: tulkinta -> tapahtumat)
 from .organizers import classify, organizer_hints
@@ -65,6 +65,16 @@ def _quoted_from(evidence: str, text: str) -> bool:
     return all(found(w) for w in wanted)
 
 
+def _with_relative_day(proposal: dict, text: str, sent: date) -> dict:
+    """Pieni malli ohittaa helposti sanan "huomenna" ja päätyy viikkotasolle ("ensi viikko"). Kun viesti nimeää päivän vain
+    sanalla huomenna/ylihuomenna/tänään eikä puhu viikoista, päivä lasketaan lähetyspäivästä koodissa."""
+    day = relative_day(text, sent)
+    if day is None or proposal.get("date") or proposal.get("weekday") or proposal.get("week") or proposal.get("weeks") \
+            or re.search(r"viikol|viikko|vko", text.lower()):
+        return proposal
+    return {**proposal, "date": day.isoformat(), "relative_week": "", "timing_evidence": ""}
+
+
 def _without_unfounded_day(proposal: dict, text: str, sent: date) -> dict:
     """Pieni malli keksii helposti tarkan päivän tai viikonpäivän, vaikka viesti puhuu vain viikosta. Tarkka päivä ja viikonpäivä
     hyväksytään vain, jos malli perustelee ne lainauksella viestistä (`timing_evidence`) tai viesti mainitsee ne itse missä
@@ -111,7 +121,7 @@ def _accept(proposal: dict, message: Message, today: date, explain: bool,
     category, title = (str(proposal.get(k) or "").strip() for k in ("category", "title"))
     if not title or category not in CATEGORY:
         return [], []
-    proposal = _without_unfounded_day(proposal, message.text, message.info.sent)
+    proposal = _without_unfounded_day(_with_relative_day(proposal, message.text, message.info.sent), message.text, message.info.sent)
 
     shown = f" [{describe_when(proposal)}]" if explain else ""
     targets, problem = resolve_when(proposal, message.info.sent)

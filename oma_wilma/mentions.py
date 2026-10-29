@@ -7,7 +7,7 @@ ke 4.11., huomenna), ja viikonpäivä, jos viestissä on sen nimi taivutettuna. 
 from __future__ import annotations
 
 import re
-from datetime import date
+from datetime import date, timedelta
 
 WEEKDAY_STEMS = ["maanan", "tiista", "keskiv", "torsta", "perjan"]       # taivutukset: maanantaina, keskiviikon, torstaisin ...
 ABBREVIATIONS = ["ma", "ti", "ke", "to", "pe"]
@@ -32,3 +32,11 @@ def date_in_text(day: date, text: str, sent: date) -> bool:
     if has_day and has_month:
         return True
     return any(word in low and (day - sent).days == offset for word, offset in RELATIVE_DAYS.items())
+
+
+def relative_day(text: str, sent: date) -> date | None:
+    """Päivä, jonka viesti nimeää sanalla huomenna/ylihuomenna/tänään lähetyspäivästä laskettuna. None, jos sanoja ei ole tai
+    niitä on useampi (viestissä on silloin useita ajankohtia, eikä yksi niistä voi ratkaista kaikkia)."""
+    low = text.lower()
+    offsets = {o for word, o in RELATIVE_DAYS.items() if re.search(rf"(?<![a-zåäö]){word}(?![a-zåäö])", low)}
+    return sent + timedelta(days=offsets.pop()) if len(offsets) == 1 else None

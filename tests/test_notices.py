@@ -35,6 +35,16 @@ class InterpretTest(unittest.TestCase):
         self.assertIn("Muistakaa lukea kotona.", seen["prompt"])
 
 
+    def test_tomorrow_is_computed_from_send_date_even_if_model_says_next_week(self):
+        m = msg("Huomenna ulkoliikuntaa👍", sent=date(2026, 10, 29))
+        items, notes = notices.interpret(m, answer(item(relative_week="ensi viikko")), date(2026, 10, 29))
+        self.assertEqual((notes, [i["date"] for i in items]), ([], [date(2026, 10, 30)]))
+
+    def test_tomorrow_does_not_override_explicit_week(self):
+        m = msg("Huomenna kuvaus, ensi viikolla ulkoliikuntaa", sent=date(2026, 10, 29))
+        items, _ = notices.interpret(m, answer(item(relative_week="ensi viikko")), date(2026, 10, 29))
+        self.assertEqual([i.get("week") for i in items], [date(2026, 11, 2)])
+
     def test_no_time_expression_rejected(self):
         items, notes = self.run_(SKATING, item())
         self.assertEqual((items, notes), ([], ["ajankohta ei selvinnyt"]))
