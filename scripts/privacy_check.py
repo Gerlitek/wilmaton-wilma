@@ -3,6 +3,9 @@
 Etsii seurattavista ja vielä lisäämättömistä (ei .gitignoressa olevista) tiedostoista:
   - .env:n arvoja (koulun osoitteen nimi, käyttäjätunnus) ja config.toml:n henkilökohtaisia arvoja (vanhempi lapsi, ulkopuoliset järjestäjät)
   - omia sanoja tiedostosta .private-terms.txt (yksi per rivi, ei Gitissä): lasten nimet, oppilasnumerot, paikkakunta ym.
+    Isolla alkukirjaimella kirjoitettu sana (esim. Onni) haetaan tarkasti: vain sanan alusta ja samalla kirjoitusasulla
+    (Onni, Onnin), jotta lyhyt etunimi ei osu sanojen keskelle (tapahtumaonni). Pienellä kirjoitettu haetaan kirjainkoosta
+    riippumatta mistä tahansa.
 Aja: python3 scripts/privacy_check.py [--history]   (--history tarkistaa myös kaikki commitit)
 Palauttaa 1, jos jokin löytyy. Voi asentaa pre-commit-koukuksi (.git/hooks/pre-commit).
 """
@@ -20,6 +23,15 @@ MIN_LEN = 4
 SAFE = {"wilma", "http", "https", "koulu", "tenant"}   # yleisiä sanoja, joita ei tarkisteta
 
 
+def exact_terms() -> set[str]:
+    """Isolla alkukirjaimella kirjoitetut sanat .private-terms.txt:stä: haetaan tarkasti sanan alusta."""
+    extra = ROOT / ".private-terms.txt"
+    if not extra.is_file():
+        return set()
+    lines = (l.strip() for l in extra.read_text(encoding="utf-8").splitlines())
+    return {l for l in lines if len(l) >= MIN_LEN and l[0].isupper() and not l.startswith("#")}
+
+
 def terms() -> set[str]:
     out: set[str] = set()
     env = ROOT / ".env"
@@ -34,11 +46,12 @@ def terms() -> set[str]:
     extra = ROOT / ".private-terms.txt"
     if extra.is_file():
         out |= {l.strip() for l in extra.read_text(encoding="utf-8").splitlines() if l.strip() and not l.startswith("#")}
-    return {t for t in out if t and len(t) >= MIN_LEN and t.lower() not in SAFE}
+    return {t for t in out if t and len(t) >= MIN_LEN and t.lower() not in SAFE} | exact_terms()
 
 
 def main() -> int:
     ts = terms()
+    exact = exact_terms()
     if not ts:
         print("Ei tarkistettavia sanoja. Lisää omat sanat tiedostoon .private-terms.txt (yksi per rivi).")
         return 0
@@ -46,13 +59,14 @@ def main() -> int:
                                        capture_output=True, text=True, check=True).stdout.split("\n") if f]
     bad = []
     for term in sorted(ts):
-        r = subprocess.run(["git", "grep", "--untracked", "-n", "-i", "-F", "-e", term, "--", *files], cwd=ROOT,
+        flags, pattern = (["-E"], r"(^|[^[:alpha:]])" + term) if term in exact else (["-i", "-F"], term)
+        r = subprocess.run(["git", "grep", "--untracked", "-n", *flags, "-e", pattern, "--", *files], cwd=ROOT,
                            capture_output=True, text=True)
         bad += [f"{term!r}: {line[:100]}" for line in r.stdout.splitlines()]
         if "--history" in sys.argv:
             revs = subprocess.run(["git", "rev-list", "--all"], cwd=ROOT, capture_output=True, text=True).stdout.split()
             if revs:
-                h = subprocess.run(["git", "grep", "-l", "-i", "-F", "-e", term, *revs], cwd=ROOT, capture_output=True, text=True)
+                h = subprocess.run(["git", "grep", "-l", *flags, "-e", pattern, *revs], cwd=ROOT, capture_output=True, text=True)
                 bad += [f"{term!r} HISTORIASSA: {line[:100]}" for line in h.stdout.splitlines()[:3]]
     for b in bad:
         print("LÖYTYI", b)
