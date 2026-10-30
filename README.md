@@ -7,7 +7,7 @@ calendar, one calendar per child. Messages never leave your machine. Unofficial;
 Nimi on sanaleikki: oleelliset näkyvät kalenterissa, joten Wilmaa tarvitsee avata vähemmän. Koodi ja komennot ovat silti `oma_wilma`.
 
 Vie Wilman **kokeet** ja **opettajien viesteissä kerrotut asiat** (liikunnan varusteet, kuvauspäivä, retki, tapahtumat)
-iCloud-kalenteriisi muistutuksineen: yksi kalenteri `Wilma <etunimi>` lasta kohden. Wilmaa vain luetaan. Viestit tulkitsee **vain paikallinen Ollama**,
+iCloud-kalenteriisi muistutuksineen: yksi kalenteri `Wilma <etunimi>` lasta kohden. Wilmaa vain luetaan. Viestit tulkitsee **vain paikallinen Ollama** (omalla koneella pyörivä tekoäly),
 eli viestin sisältö ei lähde koneelta. Tehty macOS:lle yksityiskäyttöön; ei liity Vismaan tai Wilmaan.
 
 ## Miksi ottaa käyttöön
@@ -20,7 +20,7 @@ ne puolestasi kalenteriin, jota katsot muutenkin.
 - **Muistutus ajoissa:** kokeesta kaksi päivää etukäteen, varusteista edellisenä iltana. Otsikossa on tärkein (esim. `🎽Luistelu: luistimet`), loput muistiinpanoissa.
 - **Liikunta osuu oikealle päivälle:** kun viesti sanoo vain "ensi viikolla", päivä haetaan lapsen lukujärjestyksen liikuntatunneilta.
 - **Ei kuittausta lapsi kerrallaan:** Wilmassa sama viesti pitää kuitata käsin erikseen jokaiselle lapselle. Täällä usealle lapselle tuleva viesti käsitellään kerran.
-- **Yksityinen:** viestit tulkitsee tekoäly, joka pyörii omalla koneellasi. Viestin teksti ei lähde koneelta; iCloud-kalenteriin menee vain tulkittu tapahtuma.
+- **Yksityinen:** viestit tulkitsee [Ollama](https://ollama.com), ohjelma, joka ajaa tekoälymallin (tässä Googlen Gemma) kokonaan omalla koneellasi. Malli ladataan kerran, minkä jälkeen tulkinta ei tarvitse nettiyhteyttä. Viestin teksti ei lähde koneelta; iCloud-kalenteriin menee vain tulkittu tapahtuma.
 
 ```mermaid
 flowchart LR
@@ -73,6 +73,10 @@ flowchart TB
 | wilmai / wilma-CLI | Wilma-haku | `npm install` |
 | pyobjc (EventKit) | kalenteriin kirjoitus | `pip install -r requirements.txt` |
 | Ollama | viestien tulkinta | ollama.com, `ollama pull gemma4:12b` |
+
+**Ollamasta:** asenna Ollama-sovellus (ollama.com) ja lataa malli kerran: `ollama pull gemma4:12b` (7,7 Gt levyä; testattu 16 Gt:n muistilla). Sovellus pitää
+palvelimen käynnissä taustalla; ilman sovellusta sen voi käynnistää käsin: `ollama serve`. Ajastetussa ajossa `scripts/run.sh` käynnistää palvelimen
+itse, jos se ei vastaa, joten erillistä automaattista käynnistystä ei tarvita.
 
 ## Asennus
 
@@ -152,6 +156,8 @@ scripts/update-wilmai.sh [latest]               päivittää wilmai-CLI:n ja aja
 ```
 
 Koodin rakenne: `oma_wilma/` (`bridge`, `models`, `sync_exams`, `sync_messages`, `prompt`, `notices`, `when`, `notice_events`, `calendars`, `calendar_export`).
+**Kokeet:** kokeiden haun kuiva-ajo on tehty (Wilma vastasi ilman virheitä), mutta kalenterivientiä ei ole vielä testattu oikealla datalla, koska kokeita ei ole ollut tulossa. Odotamme koeviikkoa. Siihen asti kokeiden osuus on testattu vain keksityllä datalla.
+
 **Epävirallinen työkalu.** Wilman käyttöehtoja ei ole varmistettu tälle käytölle; käytä omalla vastuullasi ja omilla tunnuksillasi, vain omien lasten tietoihin.
 
 ## Windows (ei testattu)
