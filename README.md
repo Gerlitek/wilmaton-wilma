@@ -19,7 +19,7 @@ ne puolestasi kalenteriin, jota katsot muutenkin.
 - **Kaikki yhdessä paikassa:** kokeet ja viesteissä kerrotut asiat näkyvät kalenterissa.
 - **Muistutus ajoissa:** kokeesta kaksi päivää etukäteen, varusteista edellisenä iltana. Otsikossa on tärkein (esim. `🎽Luistelu: luistimet`), loput muistiinpanoissa.
 - **Liikunta osuu oikealle päivälle:** kun viesti sanoo vain "ensi viikolla", päivä haetaan lapsen lukujärjestyksen liikuntatunneilta.
-- **Ei kuittailua lapsi kerrallaan:** Wilmassa sama viesti pitää kuitata käsin erikseen jokaiselle lapselle. Täällä usealle lapselle tuleva viesti käsitellään kerran.
+- **Ei kuittausta lapsi kerrallaan:** Wilmassa sama viesti pitää kuitata käsin erikseen jokaiselle lapselle. Täällä usealle lapselle tuleva viesti käsitellään kerran.
 - **Yksityinen:** viestit tulkitsee tekoäly, joka pyörii omalla koneellasi. Viestin teksti ei lähde koneelta; iCloud-kalenteriin menee vain tulkittu tapahtuma.
 
 ```mermaid
@@ -152,7 +152,7 @@ scripts/update-wilmai.sh [latest]               päivittää wilmai-CLI:n ja aja
 ```
 
 Koodin rakenne: `oma_wilma/` (`bridge`, `models`, `sync_exams`, `sync_messages`, `prompt`, `notices`, `when`, `notice_events`, `calendars`, `calendar_export`).
-Wilman (Vismän) käyttöehtoja ei ole vielä tarkistettu.
+**Epävirallinen työkalu.** Wilman käyttöehtoja ei ole varmistettu tälle käytölle; käytä omalla vastuullasi ja omilla tunnuksillasi, vain omien lasten tietoihin.
 
 ## Windows (ei testattu)
 
