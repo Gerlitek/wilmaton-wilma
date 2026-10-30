@@ -6,9 +6,9 @@ calendar, one calendar per child. Messages never leave your machine. Unofficial;
 
 Nimi on sanaleikki: oleelliset näkyvät kalenterissa, joten Wilmaa tarvitsee avata vähemmän. Koodi ja komennot ovat silti `oma_wilma`.
 
-Vie Wilman **kokeet** ja **opettajien viesteissä kerrotut asiat** (liikunnan varusteet, kuvauspäivä, retki, tapahtumat)
-iCloud-kalenteriisi muistutuksineen: yksi kalenteri `Wilma <etunimi>` lasta kohden. Wilmaa vain luetaan. Viestit tulkitsee **vain paikallinen Ollama** (omalla koneella pyörivä tekoäly),
-eli viestin sisältö ei lähde koneelta. Tehty macOS:lle yksityiskäyttöön; ei liity Vismaan tai Wilmaan.
+Vie Wilman **kokeet** ja **opettajien viesteissä kerrotut asiat** (liikunnan varusteet, kuvauspäivä, retki, tapahtumat) iCloud-kalenteriisi
+muistutuksineen: yksi kalenteri `Wilma <etunimi>` lasta kohden. Viestit tulkitsee **vain paikallinen Ollama** (omalla koneella pyörivä
+tekoäly), eli viestin sisältö ei lähde koneelta. Tehty macOS:lle yksityiskäyttöön. Epävirallinen työkalu: ei liity Vismaan.
 
 ## Miksi ottaa käyttöön
 
@@ -34,6 +34,8 @@ flowchart LR
 Hyvä tietää: Wilmaa vain luetaan, mutta viestin avaaminen voi merkitä sen Wilmassa luetuksi. Tekoäly erehtyy joskus, joten tärkeät asiat kannattaa tarkistaa alkuperäisestä viestistä.
 
 **Kokeiden vienti kalenteriin on vielä testaamatta oikealla datalla:** kokeiden haun kuiva-ajo on tehty (Wilma vastasi ilman virheitä), mutta kokeita ei ole ollut tulossa. Odotamme koeviikkoa. Siihen asti kokeiden osuus on testattu vain keksityllä datalla.
+
+**Epävirallinen työkalu.** Wilman käyttöehtoja ei ole varmistettu tälle käytölle; käytä omalla vastuullasi ja omilla tunnuksillasi, vain omien lasten tietoihin.
 
 ## Rakenne
 
@@ -82,7 +84,10 @@ itse, jos se ei vastaa, joten erillistä automaattista käynnistystä ei tarvita
 
 ## Asennus
 
+Tarvitset: macOS, [Node.js](https://nodejs.org) 20.18.1 tai uudempi, Python 3.11 tai uudempi, Ollama ja iCloud-kalenterit.
+
 ```
+git clone https://github.com/Gerlitek/wilmaton-wilma.git && cd wilmaton-wilma
 npm install
 cp .env.example .env                # WILMA_TENANT ja WILMA_USERNAME
 cp config.example.toml config.toml  # henkilökohtaiset asetukset (lapset, järjestäjät, muistutukset)
@@ -158,8 +163,6 @@ scripts/update-wilmai.sh [latest]               päivittää wilmai-CLI:n ja aja
 ```
 
 Koodin rakenne: `oma_wilma/` (`bridge`, `models`, `sync_exams`, `sync_messages`, `prompt`, `notices`, `when`, `notice_events`, `calendars`, `calendar_export`).
-
-**Epävirallinen työkalu.** Wilman käyttöehtoja ei ole varmistettu tälle käytölle; käytä omalla vastuullasi ja omilla tunnuksillasi, vain omien lasten tietoihin.
 
 ## Windows (ei testattu)
 
