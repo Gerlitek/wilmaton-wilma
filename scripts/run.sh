@@ -6,15 +6,17 @@
 cd "$(dirname "$0")/.." || exit 1
 mkdir -p data
 
-# --if-due (ajastus): kone sammutetaan päivittäin, joten ajo yritetään kirjautuessa ja kello 16. Tämä rajaa sen kerran
-# päivässä: jos viimeisin onnistunut ajo on tältä päivältä, ei tehdä mitään.
+# --if-due (ajastus): kone sammutetaan päivittäin, joten ajo yritetään kirjautuessa ja kello 16. Ajo ohitetaan, jos
+# viimeisin onnistunut ajo on uudempi kuin viimeisin ajastuspiste (tänään klo 16, tai ennen sitä tämän päivän alku).
+# Aamun kirjautumisajo ei siis estä klo 16 ajoa, jolloin päivän aikana tulleet viestit käsitellään.
 DUE=0
 ARGS=()
 for a in "$@"; do
   if [ "$a" = "--if-due" ]; then DUE=1; else ARGS+=("$a"); fi
 done
 if [ $DUE -eq 1 ]; then
-  if [ -f data/last-ok ] && [ "$(date -r data/last-ok +%F)" = "$(date +%F)" ]; then exit 0; fi
+  if [ "$(date +%H)" -ge 16 ]; then since=$(date -v16H -v0M -v0S +%s); else since=$(date -v0H -v0M -v0S +%s); fi
+  if [ -f data/last-ok ] && [ "$(date -r data/last-ok +%s)" -ge "$since" ]; then exit 0; fi
   sleep 45   # annetaan kirjautumisen ja Wi-Fin rauhoittua
 fi
 

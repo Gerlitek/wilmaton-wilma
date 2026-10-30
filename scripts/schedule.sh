@@ -1,6 +1,6 @@
 #!/bin/bash
 # Ajastus: scripts/schedule.sh on | off | status | test
-# on      asentaa launchd-työn: joka päivä klo 16.00 ja kirjautuessa, mutta vain kerran päivässä
+# on      asentaa launchd-työn: joka päivä klo 16.00 ja kirjautuessa, mutta ohittaa ajon, jos viimeisin onnistunut ajo on uudempi kuin viimeisin ajastuspiste
 # off     poistaa ajastuksen
 # status  näyttää tilan ja viimeisen ajon lokin lopun
 # test    ajaa työn heti launchdin kautta (sama ympäristö kuin ajastetussa ajossa) ja seuraa lokia
@@ -18,7 +18,7 @@ case "$1" in
     plutil -lint "$PLIST"
     launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
     launchctl bootstrap "$DOMAIN" "$PLIST"
-    echo "Ajastus päällä: joka päivä klo 16.00 ja kirjautuessa (kerran päivässä). Kokeile heti: scripts/schedule.sh test"
+    echo "Ajastus päällä: joka päivä klo 16.00 ja kirjautuessa. Kokeile heti: scripts/schedule.sh test"
     ;;
   off)
     launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
