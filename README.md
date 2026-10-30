@@ -1,8 +1,37 @@
-# wilma
+# Wilmaton Wilma
 
-Vie Wilman **kokeet** ja **opettajien viesteissä kerrotut asiat** (liikunnan varusteet, kuvauspäivä, retki, tapahtumat) lapsen
-omaan iCloud-kalenteriin `Wilma <etunimi>` muistutuksineen. Wilmaa vain luetaan. Viestit tulkitsee **vain paikallinen Ollama**,
+*Wilma without Wilma: the essentials show up in your calendar, so you rarely need to open it.* A small macOS tool that reads Wilma (Finnish school messaging system)
+for exams and teachers' messages, interprets the messages with a local Ollama model, and puts the dates into your iCloud
+calendar, one calendar per child. Messages never leave your machine. Unofficial; not affiliated with Visma. Docs are in Finnish.
+
+Nimi on sanaleikki: oleelliset näkyvät kalenterissa, joten Wilmaa tarvitsee avata vähemmän. Koodi ja komennot ovat silti `oma_wilma`.
+
+Vie Wilman **kokeet** ja **opettajien viesteissä kerrotut asiat** (liikunnan varusteet, kuvauspäivä, retki, tapahtumat)
+iCloud-kalenteriisi muistutuksineen: yksi kalenteri `Wilma <etunimi>` lasta kohden. Wilmaa vain luetaan. Viestit tulkitsee **vain paikallinen Ollama**,
 eli viestin sisältö ei lähde koneelta. Tehty macOS:lle yksityiskäyttöön; ei liity Vismaan tai Wilmaan.
+
+## Miksi ottaa käyttöön
+
+Wilmassa on kaksi paikkaa, joita ei tule säännöllisesti kurkistettua. Kokeet löytyvät omasta Kokeet-osiostaan. Opettajien viesteistä moni
+koskee jotain tiettyä päivää ("ensi viikolla luistelu, ota luistimet", "kuvauspäivä torstaina") ja hukkuu muun joukkoon. Tämä työkalu vie
+ne puolestasi kalenteriin, jota katsot muutenkin.
+
+- **Kaikki yhdessä paikassa:** kokeet ja viesteissä kerrotut asiat näkyvät kalenterissa.
+- **Muistutus ajoissa:** kokeesta kaksi päivää etukäteen, varusteista edellisenä iltana. Otsikossa on tärkein (esim. `🎽Luistelu: luistimet`), loput muistiinpanoissa.
+- **Liikunta osuu oikealle päivälle:** kun viesti sanoo vain "ensi viikolla", päivä haetaan lapsen lukujärjestyksen liikuntatunneilta.
+- **Ei kuittailua lapsi kerrallaan:** Wilmassa sama viesti pitää kuitata käsin erikseen jokaiselle lapselle. Täällä usealle lapselle tuleva viesti käsitellään kerran.
+- **Yksityinen:** viestit tulkitsee tekoäly, joka pyörii omalla koneellasi. Viestin teksti ei lähde koneelta; iCloud-kalenteriin menee vain tulkittu tapahtuma.
+
+```mermaid
+flowchart LR
+    W[("Wilma")] --> K["Haetaan kokeet"]
+    W --> V["Luetaan opettajien viestit<br/>ja poimitaan tapahtumat"]
+    K --> L["Verrataan lukujärjestykseen<br/>(liikuntapäivä)"]
+    V --> L
+    L --> C["Kalenteriin: tapahtuma,<br/>muistutus ja muistiinpanot<br/>(varusteet)"]
+```
+
+Hyvä tietää: Wilmaa vain luetaan, mutta viestin avaaminen voi merkitä sen Wilmassa luetuksi. Tekoäly erehtyy joskus, joten tärkeät asiat kannattaa tarkistaa alkuperäisestä viestistä.
 
 ## Rakenne
 
@@ -43,7 +72,7 @@ flowchart TB
 |---|---|---|
 | wilmai / wilma-CLI | Wilma-haku | `npm install` |
 | pyobjc (EventKit) | kalenteriin kirjoitus | `pip install -r requirements.txt` |
-| Ollama | viestien tulkinta | ollama.com, `ollama pull qwen3:8b` |
+| Ollama | viestien tulkinta | ollama.com, `ollama pull gemma4:12b` |
 
 ## Asennus
 
@@ -103,7 +132,7 @@ flowchart LR
 - **Malli:** luokka, otsikko, varusteet (pakolliset, valinnaiset, kielletyt), onko järjestäjä koulu, ajankohta (viikonpäivä, päiväys, viikko) ja epäselvyys. Lapsen omat viimeaikaiset merkinnät (poissaolot) annetaan sille, jotta se ratkaisee koskeeko ehdollinen viesti juuri tätä lasta.
 - **Koodi:** laskee päivät viikosta ja viikonpäivästä, hylkää mahdottoman (ei ajankohtaa, mennyt, yli 90 pv), hyväksyy tarkan päivän vain jos viesti mainitsee sen, ja varmistaa oikean lapsen kalenterin.
 - **Viikkoon sidottu liikunta** sijoitetaan oppilaan lukujärjestyksen liikuntatunneille; viestissä nimetty päivä menee sille päivälle.
-- **Sisarukset:** sama viesti usealle lapselle käsitellään kerran ja menee `shared_priority`-listan ensimmäiselle.
+- **Sisarukset:** sama viesti usealle lapselle käsitellään kerran ja menee `shared_priority`-listan ensimmäiselle. Lapsia voi olla kolme, neljä tai useampi: listaan voi laittaa kaikki, ja tapahtuman otsikossa on aina sama 👬-merkki sekä kuvauksessa lista muista lapsista, joille viesti tuli.
 - **Toisto ei tuplaa:** tapahtuman tunniste on oppilas, laji ja päivä; saman päivän eri viestit yhdistetään, ja uudelleenkäsitelty viesti korvaa oman vanhan osuutensa.
 
 ## Asetukset ja turvarajat
@@ -124,3 +153,16 @@ scripts/update-wilmai.sh [latest]               päivittää wilmai-CLI:n ja aja
 
 Koodin rakenne: `oma_wilma/` (`bridge`, `models`, `sync_exams`, `sync_messages`, `prompt`, `notices`, `when`, `notice_events`, `calendars`, `calendar_export`).
 Wilman (Vismän) käyttöehtoja ei ole vielä tarkistettu.
+
+## Windows (ei testattu)
+
+Työkalu on tehty macOS:lle eikä sitä ole testattu Windowsissa, eikä sitä aiota testata. Karkea suunta niille, jotka haluavat kokeilla:
+Wilma-haku (wilmai), Python-koodi ja Ollama toimivat sellaisinaan myös Windowsissa. macOS-sidonnaiset osat pitää korvata:
+kalenteriin kirjoitus (`calendar_export.py`, EventKit/pyobjc; esim. Outlook tai Google Calendar -rajapinta tai `.ics`-tiedostot),
+salasanat (macOS Keychain; esim. Windowsin Credential Manager tai ympäristömuuttujat) ja ajastus (`launchd`; esim. Windowsin
+Tehtävien ajoitus (Task Scheduler), jolla ajetaan `scripts/run.sh`:n vastine).
+
+## Lisenssi
+
+[MIT](LICENSE). Wilma-haun tekee [wilmai](https://github.com/aikarjal/wilmai) (`@wilm-ai/wilma-cli`, MIT, © Wilm.ai), joka asennetaan
+npm-riippuvuutena eikä sisälly tähän repoon.

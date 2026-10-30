@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 from . import config
 
 DEFAULT_URL = "http://localhost:11434"
-DEFAULT_MODEL = "qwen3:8b"
+DEFAULT_MODEL = "gemma4:12b"
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1"}
 
 

@@ -2,7 +2,7 @@
 
 [ollama]
 url = "http://localhost:11434"     # vain tämä kone sallitaan (localhost); viestejä ei lähetetä minnekään muualle
-model = "qwen3:8b"
+model = "gemma4:12b"
 
 [messages]
 shared_priority = []              # lapset tärkein ensin (oppilasnumero tai nimen alku), esim. ["Kiia", "Onni"]: koulun yhteinen viesti
