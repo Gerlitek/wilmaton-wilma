@@ -1,4 +1,5 @@
 """Viestien synkka (sync_messages.py): yhteiset viestit, käsiteltävien valinta, vanhentuneet, asetukset ja Ollama vain paikallisesti."""
+import json
 import unittest
 from datetime import date
 from unittest import mock
@@ -180,6 +181,14 @@ class OllamaLocalOnlyTest(unittest.TestCase):
             with self.assertRaises(ollama.OllamaError):
                 ollama.chat_json("salainen", {}, {"ollama": {"url": "http://example.com"}})
         op.assert_not_called()
+
+    def test_chat_unloads_model_after_request(self):
+        resp = mock.MagicMock()
+        resp.__enter__.return_value.read.return_value = b'{"message": {"content": "{}"}}'
+        with mock.patch("urllib.request.urlopen", return_value=resp) as op:
+            ollama.chat_json("x", {}, {"ollama": {"url": "http://localhost:11434"}})
+        sent = json.loads(op.call_args[0][0].data)
+        self.assertEqual(sent["keep_alive"], 0)
 
 
 if __name__ == "__main__":

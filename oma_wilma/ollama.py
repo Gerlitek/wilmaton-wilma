@@ -48,8 +48,10 @@ def status(cfg: dict | None = None) -> str | None:
 def chat_json(prompt: str, schema: dict, cfg: dict | None = None) -> dict:
     """Kysyy Ollamalta ja palauttaa skeeman mukaisen JSONin. Virheviestiin ei oteta mukaan promptia tai vastausta."""
     url, model = settings(cfg)
+    # keep_alive 0: malli puretaan muistista heti vastauksen jälkeen. Ollaman MLX-runner ei vapauta muistia kyselyiden
+    # välillä, joten pitkä ajo kasvattaisi muistinkäytön koko RAMiin. Hitaampi ajo on hyväksyttävä hinta (ajo on taustalla).
     body = json.dumps({"model": model, "messages": [{"role": "user", "content": prompt}], "format": schema,
-                       "stream": False, "think": False, "options": {"temperature": 0}}).encode()
+                       "stream": False, "think": False, "keep_alive": 0, "options": {"temperature": 0}}).encode()
     req = urllib.request.Request(url + "/api/chat", body, {"Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=300) as r:
