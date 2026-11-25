@@ -4,7 +4,8 @@ import unittest
 from datetime import date
 from unittest import mock
 
-from oma_wilma import models, config, messages, notices, ollama, organizers, sync_messages
+from oma_wilma import models, config
+from oma_wilma.calendar_sync import messages, notices, ollama, organizers, sync_messages
 from oma_wilma.models import Student
 from .helpers import KIIA, ONNI, info, SKATING
 

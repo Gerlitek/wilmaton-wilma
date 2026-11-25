@@ -2,7 +2,7 @@
 import unittest
 from datetime import date
 
-from oma_wilma import organizers, prompt
+from oma_wilma.calendar_sync import organizers, prompt
 
 
 class OrganizerTest(unittest.TestCase):

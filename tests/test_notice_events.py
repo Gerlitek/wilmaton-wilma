@@ -3,7 +3,7 @@ import unittest
 from datetime import date, datetime, timedelta
 from unittest import mock
 
-from oma_wilma import calendars, events, messages, notices, report
+from oma_wilma.calendar_sync import calendars, events, messages, notices, report
 from oma_wilma.models import Exam, Lesson, Student
 from .helpers import KIIA, ONNI, info, msg, answer, item, SKATING, ITEM, WEEK_TEXT, WEEK_ITEM, TWO_WEEKS
 

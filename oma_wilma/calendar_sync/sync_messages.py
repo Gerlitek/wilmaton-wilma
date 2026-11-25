@@ -19,8 +19,9 @@ from dataclasses import replace
 from datetime import date, timedelta
 
 from . import messages as msgs
-from . import models, ollama
-from .config import ROOT, settings
+from .. import models
+from . import ollama
+from ..config import ROOT, settings
 from .notice_events import build_events, expand_weeks
 from .notices import Ask, ask_model, drop_overridden, interpret
 from .report import format_events

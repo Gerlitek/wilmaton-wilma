@@ -2,7 +2,7 @@
 
 Etsii seurattavista ja vielä lisäämättömistä (ei .gitignoressa olevista) tiedostoista:
   - .env:n arvoja (koulun osoitteen nimi, käyttäjätunnus) ja config.toml:n henkilökohtaisia arvoja (vanhempi lapsi, ulkopuoliset järjestäjät)
-  - omia sanoja tiedostosta .private-terms.txt (yksi per rivi, ei Gitissä): lasten nimet, oppilasnumerot, paikkakunta ym.
+  - omia sanoja tiedostosta private/private-terms.txt (yksi per rivi; private/ ei mene Gitiin): lasten nimet, oppilasnumerot, paikkakunta ym.
     Isolla alkukirjaimella kirjoitettu sana (esim. Onni) haetaan tarkasti: vain sanan alusta ja samalla kirjoitusasulla
     (Onni, Onnin), jotta lyhyt etunimi ei osu sanojen keskelle (tapahtumaonni). Pienellä kirjoitettu haetaan kirjainkoosta
     riippumatta mistä tahansa.
@@ -16,6 +16,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
+TERMS = ROOT / "private" / "private-terms.txt"   # omat sanat; vanha paikka .private-terms.txt käy myös
 sys.path.insert(0, str(ROOT))
 from oma_wilma.config import parse_dotenv  # noqa: E402
 
@@ -23,9 +24,14 @@ MIN_LEN = 4
 SAFE = {"wilma", "http", "https", "koulu", "tenant"}   # yleisiä sanoja, joita ei tarkisteta
 
 
+def terms_file() -> Path:
+    old = ROOT / ".private-terms.txt"
+    return old if old.is_file() and not TERMS.is_file() else TERMS
+
+
 def exact_terms() -> set[str]:
-    """Isolla alkukirjaimella kirjoitetut sanat .private-terms.txt:stä: haetaan tarkasti sanan alusta."""
-    extra = ROOT / ".private-terms.txt"
+    """Isolla alkukirjaimella kirjoitetut omat sanat: haetaan tarkasti sanan alusta."""
+    extra = terms_file()
     if not extra.is_file():
         return set()
     lines = (l.strip() for l in extra.read_text(encoding="utf-8").splitlines())
@@ -43,7 +49,7 @@ def terms() -> set[str]:
     if cfg.is_file():
         m = tomllib.loads(cfg.read_text(encoding="utf-8")).get("messages", {})
         out |= {str(x) for x in m.get("shared_priority", [])} | {str(w) for w in m.get("external_organizers", [])}
-    extra = ROOT / ".private-terms.txt"
+    extra = terms_file()
     if extra.is_file():
         out |= {l.strip() for l in extra.read_text(encoding="utf-8").splitlines() if l.strip() and not l.startswith("#")}
     return {t for t in out if t and len(t) >= MIN_LEN and t.lower() not in SAFE} | exact_terms()
@@ -53,7 +59,7 @@ def main() -> int:
     ts = terms()
     exact = exact_terms()
     if not ts:
-        print("Ei tarkistettavia sanoja. Lisää omat sanat tiedostoon .private-terms.txt (yksi per rivi).")
+        print("Ei tarkistettavia sanoja. Lisää omat sanat tiedostoon private/private-terms.txt (yksi per rivi).")
         return 0
     files = [f for f in subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=ROOT,
                                        capture_output=True, text=True, check=True).stdout.split("\n") if f]

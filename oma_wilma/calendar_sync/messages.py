@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any
 
-from . import bridge
-from .models import Student, parse_student
+from .. import bridge
+from ..models import Student, parse_student
 
 
 @dataclass(frozen=True)

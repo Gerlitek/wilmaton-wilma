@@ -1,17 +1,18 @@
 """python -m oma_wilma <komento>
 
-Komennot: check, students, exams (haku, vain luku) sekä sync-exams, sync-messages, remove-event (kalenteriin kirjoittavat)
-ja raw (mikä tahansa wilmai-komento). Kokeet ja viestit ovat omissa moduuleissaan: sync_exams.py ja sync_messages.py.
+Komennot: check, students, exams (haku, vain luku) sekä sync-exams, sync-messages, remove-event (kalenteriin kirjoittavat),
+timetable (lukujärjestykset PDF:ksi) ja raw (mikä tahansa wilmai-komento). Kokeet ja viestit ovat omissa moduuleissaan: sync_exams.py ja sync_messages.py.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from . import bridge, models
-from .report import format_exams
-from .sync_messages import DEFAULT_DAYS
+from .calendar_sync.report import format_exams
+from .calendar_sync.sync_messages import DEFAULT_DAYS
 
 
 # ---------------------------------------------------------------- komennot (kukin palauttaa poistumiskoodin)
@@ -60,24 +61,32 @@ def cmd_raw(args) -> int:
 
 
 def cmd_sync_exams(args) -> int:
-    from . import sync_exams
+    from .calendar_sync import sync_exams
     return sync_exams.run(args.student, args.dry_run)
 
 
 def cmd_sync_messages(args) -> int:
-    from . import sync_messages
+    from .calendar_sync import sync_messages
     return sync_messages.run(args.student, args.days, args.dry_run, args.again, args.explain)
 
 
+def cmd_timetable(args) -> int:
+    from .timetable import pdf as timetable_pdf
+    breaks = "all" if args.breaks else "lunch" if args.meals else "none"
+    return timetable_pdf.run(args.student, args.week, args.no_support, args.theme, breaks, args.pe_emoji,
+                             args.snack, args.lunch, args.out, args.html, args.worldview,
+                             args.start_emoji)
+
+
 def cmd_remove_event(args) -> int:
-    from .calendar_export import remove_events
+    from .calendar_sync.calendar_export import remove_events
     result = remove_events(args.uids)
     print(f"Poistettu {result['removed']}, tuntemattomia tunnisteita {result['unknown']}.")
     return 0
 
 
 COMMANDS = {"check": cmd_check, "students": cmd_students, "exams": cmd_exams, "raw": cmd_raw,
-            "sync-exams": cmd_sync_exams, "sync-messages": cmd_sync_messages, "remove-event": cmd_remove_event}
+            "sync-exams": cmd_sync_exams, "sync-messages": cmd_sync_messages, "remove-event": cmd_remove_event, "timetable": cmd_timetable}
 
 
 # ---------------------------------------------------------------- komentorivi
@@ -118,6 +127,26 @@ def build_parser() -> argparse.ArgumentParser:
                                help="näyttää viestikohtaisesti, mitä malli ehdotti, ja hylkäysten syyt (ei viestin tekstiä)")
     sync_messages.add_argument("--dry-run", action="store_true",
                                help="kertoo montako viestiä käsiteltäisiin; ei avaa viestejä eikä kirjoita mitään")
+
+    tt = sub.add_parser("timetable", help="lukujärjestykset PDF:ksi tulostettavaksi, yksi per lapsi (data/lukujarjestykset)")
+    student_option(tt)
+    tt.add_argument("--week", default="next", help="next (oletus), this tai päivämäärä YYYY-MM-DD: miltä viikolta tunnit haetaan")
+    tt.add_argument("--no-support", action="store_true",
+                    help="jättää tukiopetuksen pois (config.toml [timetable] support_words, oletus: tukiopetus, ryhmäkohtainen tuki)")
+    tt.add_argument("--theme", default="green", help="taustakuvan teema: green (palikkamaailma, oletus) tai heart (sydämet, tähdet, yksisarvinen)")
+    shown = tt.add_mutually_exclusive_group()
+    shown.add_argument("--breaks", action="store_true", help="kaikki välitunnit ja ruokailu näkyviin tuntien väliin")
+    shown.add_argument("--meals", action="store_true", help="vain ruokailu näkyviin (ei muita välitunteja)")
+    tt.add_argument("--lunch", help="ruokatunnin aika, esim. 11:35-12:00 (oletus config.toml [timetable] lunch)")
+    tt.add_argument("--pe-emoji", action="store_true", help="liikuntatunnit ja -päivät merkitään 🎽 (liikuntavaatteet mukaan)")
+    tt.add_argument("--snack", action="append", default=[], metavar="DAYS",
+                    help="välipalapäivät 🍎: mon tue wed thu fri (myös ma ti ke to pe), esim. tue,thu (kaikille) tai Kiia=tue (yhdelle); voi toistaa")
+    tt.add_argument("--start-emoji", action="store_true",
+                    help="päivän nimen viereen ☀️, jos koulu alkaa ennen ruokailua, tai 🌙, jos ruokailusta tai myöhemmin")
+    tt.add_argument("--worldview", choices=["religion", "ethics", "both", "uskonto", "et", "molemmat"], metavar="{religion,ethics,both}",
+                    help="katsomusaine: religion = Uskonto (oletus), ethics = ET, both = Uskonto / ET")
+    tt.add_argument("--out", type=Path, help="kohdehakemisto (oletus data/lukujarjestykset)")
+    tt.add_argument("--html", action="store_true", help="kirjoittaa HTML:n PDF:n sijaan (ei tarvitse Chromea)")
 
     remove = sub.add_parser("remove-event", help="poistaa tämän työkalun luoman kalenteritapahtuman tunnisteella (esim. kaksoiskappale)")
     remove.add_argument("uids", nargs="+", help="tunniste, esim. 0123456789abcdef (tapahtuman muistiinpanoissa: [wilma:...])")

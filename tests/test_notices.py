@@ -2,7 +2,7 @@
 import unittest
 from datetime import date
 
-from oma_wilma import gear, notices
+from oma_wilma.calendar_sync import gear, notices
 from .helpers import info, msg, answer, item, SKATING, ITEM, WEEK_TEXT, WEEK_ITEM, SKATING_LIST, SKATING_PROPOSAL
 
 

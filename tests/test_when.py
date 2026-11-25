@@ -2,7 +2,7 @@
 import unittest
 from datetime import date
 
-from oma_wilma import when
+from oma_wilma.calendar_sync import when
 from .helpers import msg, answer, item, WEEK_ONLY
 
 

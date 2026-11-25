@@ -18,7 +18,7 @@ import threading
 from datetime import date, datetime, time
 
 from .calendars import CALENDAR_PREFIX, verify_owners
-from .config import ROOT
+from ..config import ROOT
 from .events import plan_removals
 
 STATE = ROOT / "data" / "state.json"

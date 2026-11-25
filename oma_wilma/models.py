@@ -94,17 +94,19 @@ def parse_schedule(data: dict[str, Any]) -> list[Lesson]:
     return sorted(out, key=lambda x: (x.date, x.start or ""))
 
 
-def week_schedule(student: str, monday: date, today: date | None = None) -> list[Lesson]:
-    """Oppilaan viikon (maanantaista alkaen) tunnit. Tämä ja ensi viikko haetaan yhdellä kutsulla, muut päivä kerrallaan."""
+def week_schedule(student: str | None, monday: date, today: date | None = None) -> list[Lesson]:
+    """Oppilaan (None: kaikkien) viikon (maanantaista alkaen) tunnit. Tämä ja ensi viikko haetaan yhdellä kutsulla, muut
+    päivä kerrallaan."""
     today = today or date.today()
     this_monday = today - timedelta(days=today.weekday())
+    who = ["--student", student] if student else []
     if monday == this_monday:
-        return parse_schedule(bridge.run(["schedule", "week", "--student", student]))
+        return parse_schedule(bridge.run(["schedule", "week", *who]))
     if monday == this_monday + timedelta(weeks=1):
-        return parse_schedule(bridge.run(["schedule", "next-week", "--student", student]))
+        return parse_schedule(bridge.run(["schedule", "next-week", *who]))
     lessons: list[Lesson] = []
     for i in range(5):
-        lessons += parse_schedule(bridge.run(["schedule", (monday + timedelta(days=i)).isoformat(), "--student", student]))
+        lessons += parse_schedule(bridge.run(["schedule", (monday + timedelta(days=i)).isoformat(), *who]))
     return lessons
 
 

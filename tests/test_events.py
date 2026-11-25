@@ -1,7 +1,8 @@
 import unittest
 from datetime import date, datetime
 
-from oma_wilma import events, models
+from oma_wilma.calendar_sync import events
+from oma_wilma import models
 from oma_wilma.models import Exam, Student
 
 KIIA = Student("1001", "Kiia Virtanen")

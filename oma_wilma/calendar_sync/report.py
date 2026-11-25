@@ -4,7 +4,7 @@ Tuloste ei sisällä viestin tekstiä, vain tiivistetyt otsikot, päivät, muist
 """
 from __future__ import annotations
 
-from . import models
+from .. import models
 
 
 def describe_alarms(event: dict) -> str:

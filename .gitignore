@@ -7,9 +7,10 @@ data/
 # Salaisuudet ja henkilökohtaiset asetukset (kaikki .env-tiedostot, paitsi mallipohja)
 .env.*
 !.env.example
-.private-terms.txt
 *.log
 config.toml
 
-# Omat muistiinpanot ja tehtävälista
+# Omat muistiinpanot, tehtävälista ja yksityisyystarkistuksen sanat (private/TODO.md, private/private-terms.txt)
+private/
+.private-terms.txt
 TODO.md

@@ -1,7 +1,7 @@
 """Testien yhteiset apufunktiot ja keksityt esimerkkiviestit (ei oikeita nimiä eikä viestejä)."""
 from datetime import date
 
-from oma_wilma import messages
+from oma_wilma.calendar_sync import messages
 from oma_wilma.models import Student
 
 KIIA = Student("1001", "Kiia Virtanen")

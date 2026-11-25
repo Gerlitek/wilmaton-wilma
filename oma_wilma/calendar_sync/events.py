@@ -15,7 +15,7 @@ import re
 from datetime import date, datetime, time, timedelta
 
 from .calendars import calendar_name, owner_line
-from .models import Exam
+from ..models import Exam
 
 DEFAULT_REMINDER_HOUR = 18
 EXAM_REMINDER_DAYS = 2               # kirja ehditään pyytää kotiin ja asia lukea
@@ -45,7 +45,7 @@ def fit(text: str, limit: int = MAX_TEXT) -> str:
 
 def reminders(cfg: dict | None = None) -> dict:
     """Muistutusajat: oletukset tai config.toml:n [reminders] (hour, exam_days_before, parents_days_before)."""
-    from .config import settings
+    from ..config import settings
     r = (settings() if cfg is None else cfg).get("reminders", {})
     return {"hour": int(r.get("hour", DEFAULT_REMINDER_HOUR)), "exam_days": int(r.get("exam_days_before", EXAM_REMINDER_DAYS)),
             "parents_days": tuple(int(n) for n in r.get("parents_days_before", (1, 3)))}

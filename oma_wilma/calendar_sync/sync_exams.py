@@ -5,7 +5,7 @@ oppilaasta, ja ennen kirjoitusta tarkistetaan, että jokainen tapahtuma on oikea
 """
 from __future__ import annotations
 
-from . import models
+from .. import models
 from .events import build_exam_events
 from .report import format_events
 

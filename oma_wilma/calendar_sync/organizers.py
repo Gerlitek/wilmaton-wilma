@@ -17,7 +17,7 @@ SCHOOL_KINDS = {"parents", "event", "notice"}       # lajit, jotka ovat tiedoksi
 def organizer_hints(extra: list[str] | None = None) -> list[str]:
     """Käyttäjän antamat ulkopuolisten järjestäjien nimet vihjeeksi mallille (config.toml: [messages] external_organizers)."""
     if extra is None:
-        from .config import settings
+        from ..config import settings
         extra = settings().get("messages", {}).get("external_organizers", [])
     return [str(w).strip() for w in extra if str(w).strip()]
 

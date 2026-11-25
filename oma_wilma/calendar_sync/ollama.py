@@ -10,7 +10,7 @@ import json
 import urllib.request
 from urllib.parse import urlparse
 
-from . import config
+from .. import config
 
 DEFAULT_URL = "http://localhost:11434"
 DEFAULT_MODEL = "gemma4:12b"

@@ -16,3 +16,10 @@ pe_subject_words = ["liikunta"]    # sanat, joista lukujärjestyksen liikuntatun
 hour = 18                          # muistutuksen kellonaika
 exam_days_before = 2               # kokeen muistutus: montako päivää ennen (kirja kotiin, lukeminen)
 parents_days_before = [1, 3]       # koulun vanhempainillan muistutukset: päiviä ennen (useampi, koska tärkeä)
+
+[timetable]                        # lukujärjestysten tulostus (scripts/timetable.sh)
+lunch = ""                         # ruokatunnin aika, esim. "11:35-12:00": tähän osuva välitunti näkyy ruokailuna (--breaks)
+support_words = ["tukiopetus", "ryhmäkohtainen tuki"]   # näistä tunnistetaan tukiopetus (--no-support jättää ne pois)
+
+[timetable.names]                  # aineiden nimet lapselle (Wilman nimi = näytettävä); oletuksena Äidinkieli ja Uskonto (ET: --worldview)
+# "Suomen kieli ja kirjallisuus" = "Suomi"

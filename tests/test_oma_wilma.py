@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest import mock
 
 from oma_wilma import bridge, config, models
-from oma_wilma.report import format_exams
+from oma_wilma.calendar_sync.report import format_exams
 
 FAKE = str(Path(__file__).with_name("fake_wilma.py"))
 NO_KEYCHAIN = lambda service, account: None  # noqa: E731
