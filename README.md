@@ -29,7 +29,7 @@ opettajien viesteissä kerrotut päivät iCloud-kalenteriin, yksi kalenteri last
 ## 2. Tulostettava lukujärjestys
 
 Jokaiselle lapselle oma A4: nimi isolla ja mustavalkoinen kuva väritettäväksi (teemat `green`: palikkamaailma, `heart`:
-sydämet ja yksisarviset). Halutessasi mukaan 🎽 liikuntapäivät, 🍎 välipalapäivät, ☀️/🌙 aikainen vai myöhäinen aamu ja
+sydämet ja yksisarviset). Halutessasi mukaan 🎽 liikuntatunnit, 🍎 välipalapäivät, ☀️/🌙 aikainen vai myöhäinen aamu ja
 ruokailu.
 
 ## Asennus

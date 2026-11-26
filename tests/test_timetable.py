@@ -65,7 +65,6 @@ class BuildTest(unittest.TestCase):
         tue = tt.rows[0].lessons[1]
         self.assertEqual([e.name for e in tue], ["Matematiikka", "Ryhmäkohtainen tuki"])
         self.assertTrue(tue[1].support)
-        self.assertEqual(tt.pe_days, [True, False, False, False, False])
         self.assertEqual(tt.empty_days, [False, False, True, False, True])
 
     def test_drop_support(self):
@@ -109,6 +108,8 @@ class RenderTest(unittest.TestCase):
         self.assertIn("<title>Lukujärjestys – Kiia</title>", html)
         self.assertIn("🎽", html)
         self.assertIn("🍎 välipala", html)
+        self.assertNotIn("🎽 liikunta", html)
+        self.assertEqual(html.count("🎽"), 1)   # vain liikuntatunnilla, ei päivän otsikossa
         self.assertIn("ruokailu", html)
         self.assertNotIn("🎽", render_html(tt, themes.get("green")))
 

@@ -44,7 +44,6 @@ class Timetable:
     student: Student
     monday: date
     rows: list[Row]
-    pe_days: list[bool]
     snack_days: list[bool]
     empty_days: list[bool]
     starts_after_lunch: list[bool | None]  # None: ei tunteja tai ruokatauon aikaa ei tiedetä
@@ -175,7 +174,6 @@ def build(lessons: Iterable[Lesson], student: Student, monday: date, *, drop_sup
     firsts = [next((s[0] for s in slots if by_slot[s][i]), None) for i in range(5)]
     return Timetable(
         student=student, monday=monday, rows=rows,
-        pe_days=[any(e.pe for s in slots for e in by_slot[s][i]) for i in range(5)],
         snack_days=[i in snack for i in range(5)],
         empty_days=[not day_has(i, lambda s: True) for i in range(5)],
         starts_after_lunch=[None if not lunch or not firsts[i] else firsts[i] >= lunch[0] for i in range(5)],

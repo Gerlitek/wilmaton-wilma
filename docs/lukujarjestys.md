@@ -63,7 +63,7 @@ silti: lapsi tulee kouluun syömään.
 
 | Valinta | Mitä tekee |
 |---|---|
-| `--pe-emoji` | 🎽 liikuntatunnin eteen ja päivän otsikkoon ("🎽 liikunta"): liikuntavaatteet mukaan. Liikuntatunti tunnistetaan aineen nimestä (`config.toml`: `[messages] pe_subject_words`, oletus "liikunta"). |
+| `--pe-emoji` | 🎽 liikuntatunnin eteen: liikuntavaatteet mukaan. Liikuntatunti tunnistetaan aineen nimestä (`config.toml`: `[messages] pe_subject_words`, oletus "liikunta"). |
 | `--snack wed` | 🍎 välipala päivän otsikkoon. Päivät annetaan itse: `mon tue wed thu fri` (tai `1`–`5`), useampi pilkulla: `tue,thu`. Vain yhdelle lapselle: `--snack Kiia=tue`. Valinnan voi antaa monta kertaa. |
 | `--start-emoji` | Päivän nimen viereen ☀️, jos koulu alkaa aamulla (ennen ruokailua), tai 🌙, jos vasta ruokailusta tai myöhemmin. Tarvitsee ruokatauon ajan. |
 

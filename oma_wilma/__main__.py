@@ -138,7 +138,7 @@ def build_parser() -> argparse.ArgumentParser:
     shown.add_argument("--breaks", action="store_true", help="kaikki välitunnit ja ruokailu näkyviin tuntien väliin")
     shown.add_argument("--meals", action="store_true", help="vain ruokailu näkyviin (ei muita välitunteja)")
     tt.add_argument("--lunch", help="ruokatunnin aika, esim. 11:35-12:00 (oletus config.toml [timetable] lunch)")
-    tt.add_argument("--pe-emoji", action="store_true", help="liikuntatunnit ja -päivät merkitään 🎽 (liikuntavaatteet mukaan)")
+    tt.add_argument("--pe-emoji", action="store_true", help="liikuntatunnit merkitään 🎽 (liikuntavaatteet mukaan)")
     tt.add_argument("--snack", action="append", default=[], metavar="DAYS",
                     help="välipalapäivät 🍎: mon tue wed thu fri (myös ma ti ke to pe), esim. tue,thu (kaikille) tai Kiia=tue (yhdelle); voi toistaa")
     tt.add_argument("--start-emoji", action="store_true",

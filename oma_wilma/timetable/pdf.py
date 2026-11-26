@@ -33,10 +33,10 @@ table { position: absolute; border-collapse: collapse; table-layout: fixed; back
 th, td { border: 0.45mm solid #000; text-align: center; vertical-align: middle; padding: 0 1mm; overflow: hidden }
 thead th { font-size: 13pt; font-weight: 800; line-height: 1.05; white-space: nowrap }
 thead th.time { font-size: 10pt; font-weight: 600 }
+thead th { background: #e6e6e6; -webkit-print-color-adjust: exact; print-color-adjust: exact }
 thead .icons { display: block; height: 3.6mm; font-size: 7.5pt; font-weight: 500; line-height: 3.6mm; margin-top: 0.5mm;
                white-space: nowrap }
 thead .start { font-size: 14pt; margin-left: 1.2mm }
-thead .icons .item + .item { margin-left: 1.5mm }
 td.time { font-size: 9.5pt; font-weight: 600; white-space: nowrap }
 td.lesson .name { font-size: 13pt; font-weight: 700; line-height: 1.1 }
 td.lesson .extra { display: block; font-size: 7.5pt; font-weight: 500; margin-top: 0.4mm }
@@ -57,17 +57,12 @@ def _row_heights(tt: Timetable, box_h: float) -> tuple[float, float]:
     return unit, unit * BREAK_RATIO
 
 
-def _day_header(tt: Timetable, i: int, pe_emoji: bool, start_emoji: bool = False) -> str:
-    icons = []
-    if pe_emoji and tt.pe_days[i]:
-        icons.append(f"{PE_EMOJI} liikunta")
-    if tt.snack_days[i]:
-        icons.append(f"{SNACK_EMOJI} välipala")
+def _day_header(tt: Timetable, i: int, start_emoji: bool = False) -> str:
     # Selitteen rivi aina mukana (tyhjänäkin), jotta päivien nimet ovat samalla korkeudella.
-    items = "".join(f'<span class="item">{escape(t)}</span>' for t in icons)
+    snack = f"{SNACK_EMOJI} välipala" if tt.snack_days[i] else ""
     late = tt.starts_after_lunch[i]
     start = f'<span class="start">{AFTERNOON_EMOJI if late else MORNING_EMOJI}</span>' if start_emoji and late is not None else ""
-    return f'<th>{WEEKDAYS[i]}{start}<span class="icons">{items}</span></th>'
+    return f'<th>{WEEKDAYS[i]}{start}<span class="icons">{snack}</span></th>'
 
 
 def _lesson_cell(entries, pe_emoji: bool) -> str:
@@ -94,7 +89,7 @@ def render_html(tt: Timetable, theme: themes.Theme, *, pe_emoji: bool = False, s
             rows.append(f'<tr class="{row.kind}" style="height:{break_h:.2f}mm"><td class="time">{time}</td>{cells}</tr>')
     if not tt.rows:
         rows.append(f'<tr style="height:40mm"><td></td><td colspan="5" class="empty-day">Ei tunteja tällä viikolla</td></tr>')
-    head = "".join(_day_header(tt, i, pe_emoji, start_emoji) for i in range(5))
+    head = "".join(_day_header(tt, i, start_emoji) for i in range(5))
     title = escape(f"Lukujärjestys – {tt.first_name}")
     return f"""<!doctype html>
 <html lang="fi"><head><meta charset="utf-8"><title>{title}</title><style>{CSS}</style></head>
