@@ -106,12 +106,12 @@ class RenderTest(unittest.TestCase):
         tt = build(WEEK, KIIA, MON, breaks="all", lunch=("11:35", "12:00"), snack_days={2})
         html = render_html(tt, themes.get("green"), pe_emoji=True)
         self.assertIn("<title>Lukujärjestys – Kiia</title>", html)
-        self.assertIn("🎽", html)
-        self.assertIn("🍎 välipala", html)
-        self.assertNotIn("🎽 liikunta", html)
-        self.assertEqual(html.count("🎽"), 1)   # vain liikuntatunnilla, ei päivän otsikossa
+        self.assertIn("👕🩳", html)
+        self.assertIn("🍎 välipala mukaan", html)
+        self.assertNotIn("👕🩳 liikunta", html)
+        self.assertEqual(html.count("👕🩳"), 1)   # vain liikuntatunnilla, ei päivän otsikossa
         self.assertIn("ruokailu", html)
-        self.assertNotIn("🎽", render_html(tt, themes.get("green")))
+        self.assertNotIn("👕🩳", render_html(tt, themes.get("green")))
 
     def test_pixel_title_and_theme_lookup(self):
         self.assertEqual(len(themes.pixel_text("Ödä")), 7)

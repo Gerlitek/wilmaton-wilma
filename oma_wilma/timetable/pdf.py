@@ -17,7 +17,7 @@ from .grid import (DEFAULT_SUPPORT_WORDS, WEEKDAYS, WORLDVIEW, WORLDVIEW_ALIASES
 
 OUT_DIR = ROOT / "data" / "lukujarjestykset"
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-PE_EMOJI, SNACK_EMOJI, LUNCH_EMOJI = "🎽", "🍎", "🍽️"
+PE_EMOJI, SNACK_EMOJI, LUNCH_EMOJI = "👕🩳", "🍎", "🍽️"
 MORNING_EMOJI, AFTERNOON_EMOJI = "☀️", "🌙"  # koulu alkaa ennen ruokailua / ruokailusta tai myöhemmin
 HEADER_H = 13      # päivien otsikkorivi (mm)
 BREAK_RATIO = 0.4  # välitunnin rivi suhteessa oppitunnin riviin
@@ -59,7 +59,7 @@ def _row_heights(tt: Timetable, box_h: float) -> tuple[float, float]:
 
 def _day_header(tt: Timetable, i: int, start_emoji: bool = False) -> str:
     # Selitteen rivi aina mukana (tyhjänäkin), jotta päivien nimet ovat samalla korkeudella.
-    snack = f"{SNACK_EMOJI} välipala" if tt.snack_days[i] else ""
+    snack = f"{SNACK_EMOJI} välipala mukaan" if tt.snack_days[i] else ""
     late = tt.starts_after_lunch[i]
     start = f'<span class="start">{AFTERNOON_EMOJI if late else MORNING_EMOJI}</span>' if start_emoji and late is not None else ""
     return f'<th>{WEEKDAYS[i]}{start}<span class="icons">{snack}</span></th>'

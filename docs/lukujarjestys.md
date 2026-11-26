@@ -2,7 +2,7 @@
 
 Tekee jokaiselle lapselle oman lukujärjestyksen A4-paperille (vaaka) Wilman tunneista. Lapsen nimi on ylhäällä isoilla
 palikkakirjaimilla, ja sivun reunoilla on mustavalkoinen kuva, jonka lapsi voi värittää. Lukujärjestykseen voi lisätä
-merkkejä, jotka auttavat lasta muistamaan: 🎽 liikuntavaatteet mukaan, 🍎 välipala mukaan, ☀️/🌙 alkaako koulu aamulla vai
+merkkejä, jotka auttavat lasta muistamaan: 👕🩳 liikuntavaatteet mukaan, 🍎 välipala mukaan, ☀️/🌙 alkaako koulu aamulla vai
 vasta ruokailun jälkeen.
 
 ```
@@ -63,8 +63,8 @@ silti: lapsi tulee kouluun syömään.
 
 | Valinta | Mitä tekee |
 |---|---|
-| `--pe-emoji` | 🎽 liikuntatunnin eteen: liikuntavaatteet mukaan. Liikuntatunti tunnistetaan aineen nimestä (`config.toml`: `[messages] pe_subject_words`, oletus "liikunta"). |
-| `--snack wed` | 🍎 välipala päivän otsikkoon. Päivät annetaan itse: `mon tue wed thu fri` (tai `1`–`5`), useampi pilkulla: `tue,thu`. Vain yhdelle lapselle: `--snack Kiia=tue`. Valinnan voi antaa monta kertaa. |
+| `--pe-emoji` | 👕🩳 liikuntatunnin eteen: liikuntavaatteet mukaan. Liikuntatunti tunnistetaan aineen nimestä (`config.toml`: `[messages] pe_subject_words`, oletus "liikunta"). |
+| `--snack wed` | "🍎 välipala mukaan" päivän otsikkoon. Päivät annetaan itse: `mon tue wed thu fri` (tai `1`–`5`), useampi pilkulla: `tue,thu`. Vain yhdelle lapselle: `--snack Kiia=tue`. Valinnan voi antaa monta kertaa. |
 | `--start-emoji` | Päivän nimen viereen ☀️, jos koulu alkaa aamulla (ennen ruokailua), tai 🌙, jos vasta ruokailusta tai myöhemmin. Tarvitsee ruokatauon ajan. |
 
 ### Ulkoasu ja tiedostot
